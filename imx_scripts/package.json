@@ -14,7 +14,11 @@
     "@ethersproject/wallet": "^5.7.0",
     "@imtbl/core-sdk": "^1.0.1",
     "@imtbl/imx-sdk": "^1.40.0",
+    "@imtbl/wallet-sdk-web": "^0.1.12",
+    "browser-env": "^3.3.0",
     "dotenv": "^16.0.3",
+    "mime": "^3.0.0",
+    "nft.storage": "^7.0.0",
     "ts-node": "^10.9.1"
   }
 }

@@ -4,15 +4,15 @@ import "@nomiclabs/hardhat-etherscan";
 
 
 async function main() {
-  const Level = await ethers.getContractFactory("Level");
-  const args = [process.env.OWNER_PUBLIC_KEY!, "Level", "ACH", process.env.SANDBOX_STARK_CONTRACT_ADDRESS!];
-  const level = await Level.deploy(process.env.OWNER_PUBLIC_KEY!, "Level", "LVL", process.env.SANDBOX_STARK_CONTRACT_ADDRESS!);
+  const SpeedRunRecord = await ethers.getContractFactory("SpeedRunRecord");
+  const args = [process.env.OWNER_PUBLIC_KEY!, "SpeedRunRecord", "SRR", process.env.SANDBOX_STARK_CONTRACT_ADDRESS!];
+  const speedRunRecord = await SpeedRunRecord.deploy(process.env.OWNER_PUBLIC_KEY!, "SpeedRunRecord", "SRR", process.env.SANDBOX_STARK_CONTRACT_ADDRESS!);
   console.log("Deploying contract...");
-  await level.deployed();
-  console.log(`Level smart contract deployed at ${level.address}`);
+  await speedRunRecord.deployed();
+  console.log(`SpeedRunRecord smart contract deployed at ${speedRunRecord.address}`);
   if (network.config.chainId === 5 && process.env.ETHERSCAN_API_KEY) {
-    await level.deployTransaction.wait(6);
-    await verify(level.address, args);
+    await speedRunRecord.deployTransaction.wait(6);
+    await verify(speedRunRecord.address, args);
   }
 }
 
