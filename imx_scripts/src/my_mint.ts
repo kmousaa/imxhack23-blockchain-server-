@@ -3,7 +3,7 @@ import { AlchemyProvider } from '@ethersproject/providers';
 import { Wallet } from '@ethersproject/wallet';
 import "dotenv/config";
 
-async function main(tokenId: string, blueprint: string, user_public_key: string) {
+export async function mint_nfts(recordBlueprint: string, recordMetadataIPFSUrl: string, completionBlueprint: string, completionMetadataIPFSUrl: string, user_public_key: string) {
   const ethNetwork = 'goerli'; // Or 'mainnet'
   const provider = new AlchemyProvider(ethNetwork, process.env.ALCHEMY_API_KEY);
   const wallet = new Wallet(process.env.PRIVATE_ETH_KEY!);
@@ -17,35 +17,51 @@ async function main(tokenId: string, blueprint: string, user_public_key: string)
     signer: ethSigner
   })
 
-
-  const tokens = ([{
-    id: tokenId,
-    blueprint: blueprint,
+  const id = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER + 1).toString();
+  const recordTokens = ([{
+    id,
+    blueprint: recordBlueprint,
+  }]);
+  const completionTokens = ([{
+    id,
+    blueprint: completionBlueprint,
   }]);
 
-  const payload: ImmutableMethodParams.ImmutableOffchainMintV2ParamsTS = [
+  const recordUpdateCollectionResponse = await minter.updateCollection(process.env.RECORD_NFT_CONTRACT_ADDRESS!, { metadata_api_url: recordMetadataIPFSUrl })
+  console.log(recordUpdateCollectionResponse);
+  const completionUpdateCollectionResponse = await minter.updateCollection(process.env.COMPLETION_NFT_CONTRACT_ADDRESS!, { metadata_api_url: completionMetadataIPFSUrl })
+  console.log(completionUpdateCollectionResponse);
+
+
+  const recordPayload: ImmutableMethodParams.ImmutableOffchainMintV2ParamsTS = [
     {
-      contractAddress: "0x163eebc47d5f01d5f94c79639286b9dc69f698e5", // NOTE: a mintable token contract is not the same as regular erc token contract
+      contractAddress: process.env.RECORD_NFT_CONTRACT_ADDRESS!, // NOTE: a mintable token contract is not the same as regular erc token contract
       users: [
         {
           // etherKey: wallet.address.toLowerCase(),
           etherKey: user_public_key,
-          tokens,
+          tokens: recordTokens,
         },
       ],
     },
   ];
 
-  const result = await minter.mintV2(payload);
-  console.log(result);
+  const completionPayload: ImmutableMethodParams.ImmutableOffchainMintV2ParamsTS = [
+    {
+      contractAddress: process.env.COMPLETION_NFT_CONTRACT_ADDRESS!, // NOTE: a mintable token contract is not the same as regular erc token contract
+      users: [
+        {
+          // etherKey: wallet.address.toLowerCase(),
+          etherKey: user_public_key,
+          tokens: completionTokens,
+        },
+      ],
+    },
+  ];
+
+  const recordResult = await minter.mintV2(recordPayload);
+  const completionResult = await minter.mintV2(completionPayload);
+  console.log(recordResult);
+  console.log(completionResult);
+  return [recordResult.results[0]?.token_id, completionResult.results[0]?.token_id];
 }
-
-// const blueprint = JSON.stringify({
-//   name: "Record-9999",
-//   image_url: "https://ipfs.io/ipfs/bafybeihuswq7voav72qe4bnqbcdtdn7owouikepi73puj6n3so6ggctmue/"
-// })
-
-main("1", "seed: 9999", "0xccccd34d9b6f962fb20be544a986712be5f99926").catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});

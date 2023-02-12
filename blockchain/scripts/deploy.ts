@@ -16,6 +16,19 @@ async function main() {
   }
 }
 
+// async function main() {
+//   const FirstCompletion = await ethers.getContractFactory("FirstCompletion");
+//   const args = [process.env.OWNER_PUBLIC_KEY!, "FirstCompletion", "FC", process.env.SANDBOX_STARK_CONTRACT_ADDRESS!];
+//   const firstCompletion = await FirstCompletion.deploy(process.env.OWNER_PUBLIC_KEY!, "FirstCompletion", "FC", process.env.SANDBOX_STARK_CONTRACT_ADDRESS!);
+//   console.log("Deploying contract...");
+//   await firstCompletion.deployed();
+//   console.log(`FirstCompletion smart contract deployed at ${firstCompletion.address}`);
+//   if (network.config.chainId === 5 && process.env.ETHERSCAN_API_KEY) {
+//     await firstCompletion.deployTransaction.wait(6);
+//     await verify(firstCompletion.address, args);
+//   }
+// }
+
 async function verify(contractAddress: string, args: any[]) {
   console.log("Verifying contract...");
   try {

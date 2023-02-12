@@ -1,25 +1,29 @@
-import { Link, ImmutableXClient, ImmutableMethodParams, ProviderPreference } from "@imtbl/imx-sdk";
+import { ImmutableXClient, ImmutableMethodParams } from "@imtbl/imx-sdk";
 import "dotenv/config";
+import { AlchemyProvider } from "@ethersproject/providers";
+import { Wallet } from "@ethersproject/wallet";
 
-async function main() {
+export async function get_owned_nfts(owner_public_key: string) {
   const ethNetwork = 'goerli'; // Or 'mainnet'
+  const provider = new AlchemyProvider(ethNetwork, process.env.ALCHEMY_API_KEY);
+  const wallet = new Wallet(process.env.PRIVATE_ETH_KEY!);
+  const ethSigner = wallet.connect(provider);
   const client = await ImmutableXClient.build({
     publicApiUrl: "https://api.sandbox.x.immutable.com/v1",
-  });
+    starkContractAddress: process.env.SANDBOX_STARK_CONTRACT_ADDRESS,
+    registrationContractAddress: "0x1C97Ada273C9A52253f463042f29117090Cd7D83",
+    gasLimit: "7000000",
+    gasPrice: "40000000000",
+    signer: ethSigner
+  })
 
-  const link = new Link(process.env.REACT_APP_SANDBOX_LINK_URL);
-  // const res = await link.setup({}); // not working :(
-  const res = await link.setup({
-    providerPreference: ProviderPreference.METAMASK,
-  }); // not working :(
-  const assets = await client.getAssets({ user: res.address });
-  console.log(assets);
+  return (await client.getAssets({ user: owner_public_key })).result.map(a => a.token_id);
 }
 
 
 
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// main().catch((error) => {
+//   console.error(error);
+//   process.exitCode = 1;
+// });
